@@ -130,6 +130,8 @@ function onMidiDevice(status, data1, data2) {
                 parameterBank.selectedPageIndex().set(1);
                 parameterNumber = 3;
                 break;
+            default:
+                return;
         }
         parameterBank.getParameter(parameterNumber).inc(changeValue, ENCODER_RESOLUTION);
     } else if (isNoteOn(status) && data2 > 0) {
