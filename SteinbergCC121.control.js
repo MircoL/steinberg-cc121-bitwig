@@ -83,7 +83,7 @@ var midiListeners;
 var isJogActive = false;
 
 // Company, product, script version, UUID, author
-host.defineController("Steinberg", "CC121", "1.0", "A1068940-6B61-11E8-B566-0800200C9A66", "Philipp Winniewski");
+host.defineController("Steinberg", "CC121", "1.1", "A1068940-6B61-11E8-B566-0800200C9A66", "Philipp Winniewski");
 host.defineMidiPorts(1, 1);
 // For Windows
 host.addDeviceNameBasedDiscoveryPair(["Steinberg CC121-1"], ["Steinberg CC121-1"]);
