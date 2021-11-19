@@ -59,8 +59,8 @@ function initChannel() {
     });
 
     trackBank.getChannel(0).volume().value().addValueObserver(function(volumeValue) {
-        var LSB = (volumeValue * 16383) % 128;
-        var MSB = (volumeValue * 16383) / 128;
+        var LSB = parseInt((volumeValue * 16383) % 128);
+        var MSB = parseInt((volumeValue * 16383) / 128);
         sendMidi(224, LSB, MSB);
     });
 
