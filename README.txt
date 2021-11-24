@@ -11,10 +11,11 @@ The files are:
 - SteinbergCC121.transport.js (transport functions)
 
 When using Linux, the script should automaticly find and subscribe the controller. It can be necessary for other operating systems to manually choose the controller script and select the right MIDI-IN and MIDI-OUT devices in the Bitwig settings.
+There is an explanation what each knob and button does (assignment.pdf).  
 
-Information:
-
-Script was tested in Linux Mint 18 64-bit with Bitwig 2 and uses API version 5. There is an explanation what each knob and button does (assignment.pdf).  
+Changelog:
+Version 1.1:
+- fixed float to int conversion for volumeValue, causing script to cease working in bitwig 3.3
 
 Known issues: 
 
@@ -24,4 +25,4 @@ However, the button function itself works fine - it is only the LEDs.
 About:
 
 Author: Philipp Winniewski
-Date: 22/06/2018
+Date: 18/12/2020
