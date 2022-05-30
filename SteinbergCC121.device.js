@@ -17,7 +17,7 @@ function initDevice() {
     // Creating views
     arrangerCursorDevice = host.createEditorCursorDevice();
 
-    arrangerCursorDevice.isEnabled().addValueObserver(function(deviceEnabled) {
+    arrangerCursorDevice.isEnabled().addValueObserver(function (deviceEnabled) {
         if (deviceEnabled) {
             sendMidi(144, NOTE.ALLBYPASS, LIGHT_ON);
         } else {
@@ -29,47 +29,6 @@ function initDevice() {
     deviceBank = arrangerCursorDevice.deviceChain().createDeviceBank(1);
 
     parameterBank = arrangerCursorDevice.createCursorRemoteControlsPage(8);
-
-    // Problem: callback (LEDs) does not work proper when page 1 selected and event on page 2
-    parameterBank.getParameter(4).addValueObserver(function(parameter_4_Enabled) {
-        if (parameter_4_Enabled) {
-            sendMidi(144, NOTE.EQENABLE1, LIGHT_ON);
-            LOW_LOCKED = 127;
-        } else {
-            sendMidi(144, NOTE.EQENABLE1, LIGHT_OFF);
-            LOW_LOCKED = 0;
-        }
-    });
-
-    parameterBank.getParameter(5).addValueObserver(function(parameter_5_Enabled) {
-        if (parameter_5_Enabled) {
-            sendMidi(144, NOTE.EQENABLE2, LIGHT_ON);
-            LOWMID_LOCKED = 127;
-        } else {
-            sendMidi(144, NOTE.EQENABLE2, LIGHT_OFF);
-            LOWMID_LOCKED = 0;
-        }
-    });
-
-    parameterBank.getParameter(6).addValueObserver(function(parameter_6_Enabled) {
-        if (parameter_6_Enabled) {
-            sendMidi(144, NOTE.EQENABLE3, LIGHT_ON);
-            HIGHMID_LOCKED = 127;
-        } else {
-            sendMidi(144, NOTE.EQENABLE3, LIGHT_OFF);
-            HIGHMID_LOCKED = 0;
-        }
-    });
-
-    parameterBank.getParameter(7).addValueObserver(function(parameter_7_Enabled) {
-        if (parameter_7_Enabled) {
-            sendMidi(144, NOTE.EQENABLE4, LIGHT_ON);
-            HIGH_LOCKED = 127;
-        } else {
-            sendMidi(144, NOTE.EQENABLE4, LIGHT_OFF);
-            HIGH_LOCKED = 0;
-        }
-    });
 
     return onMidiDevice;
 }
@@ -153,26 +112,6 @@ function onMidiDevice(status, data1, data2) {
                 } else {
                     arrangerCursorDevice.browseToReplaceDevice();
                 }
-                break;
-            case NOTE.EQENABLE1:
-                LOW_LOCKED = toggleMidiCCValue(LOW_LOCKED);
-                parameterBank.selectedPageIndex().set(1);
-                parameterBank.getParameter(4).inc(LOW_LOCKED, 128);
-                break;
-            case NOTE.EQENABLE2:
-                LOWMID_LOCKED = toggleMidiCCValue(LOWMID_LOCKED);
-                parameterBank.selectedPageIndex().set(1);
-                parameterBank.getParameter(5).inc(LOWMID_LOCKED, 128);
-                break;
-            case NOTE.EQENABLE3:
-                HIGHMID_LOCKED = toggleMidiCCValue(HIGHMID_LOCKED);
-                parameterBank.selectedPageIndex().set(1);
-                parameterBank.getParameter(6).inc(HIGHMID_LOCKED, 128);
-                break;
-            case NOTE.EQENABLE4:
-                HIGH_LOCKED = toggleMidiCCValue(HIGH_LOCKED);
-                parameterBank.selectedPageIndex().set(1);
-                parameterBank.getParameter(7).inc(HIGH_LOCKED, 128);
                 break;
         }
     }

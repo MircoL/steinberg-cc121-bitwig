@@ -1,10 +1,12 @@
+var preRollMode;
+
 function initTransport() {
     // Creating views
     transport = host.createTransport();
     application = host.createApplication();
 
     // Publishing observers
-    transport.isPlaying().addValueObserver(function(play) {
+    transport.isPlaying().addValueObserver(function (play) {
         if (play) {
             sendMidi(144, NOTE.PLAY, LIGHT_ON);
         } else {
@@ -12,7 +14,7 @@ function initTransport() {
         }
     });
 
-    transport.isArrangerRecordEnabled().addValueObserver(function(record) {
+    transport.isArrangerRecordEnabled().addValueObserver(function (record) {
         if (record) {
             sendMidi(144, NOTE.RECORD, LIGHT_ON);
         } else {
@@ -20,13 +22,23 @@ function initTransport() {
         }
     })
 
-    transport.isArrangerLoopEnabled().addValueObserver(function(loop) {
+    transport.isArrangerLoopEnabled().addValueObserver(function (loop) {
         if (loop) {
             sendMidi(144, NOTE.LOOP, LIGHT_ON);
         } else {
             sendMidi(144, NOTE.LOOP, LIGHT_OFF);
         }
     })
+
+    transport.preRoll().addValueObserver(function (value) {
+        if (value.toLowerCase() === PREROLLMODE.NONE) {
+            preRollMode = PREROLLMODE.NONE;
+            sendMidi(144, NOTE.AUTOMATIONREAD, LIGHT_OFF);
+        } else {
+            preRollMode = PREROLLMODE.TWO_BARS;
+            sendMidi(144, NOTE.AUTOMATIONREAD, LIGHT_ON);
+        }
+    });
 
     return onMidiTransport;
 }
@@ -44,7 +56,7 @@ function onMidiTransport(status, data1, data2) {
                 transport.stop();
                 break;
             case NOTE.RECORD:
-                transport.record();
+                toggleRecord();
                 break;
             case NOTE.TOSTART:
                 transport.rewind();
@@ -55,6 +67,23 @@ function onMidiTransport(status, data1, data2) {
             case NOTE.TOEND:
                 transport.fastForward();
                 break;
+            case NOTE.AUTOMATIONREAD:
+                togglePreRoll();
+                break;
         }
+    }
+}
+
+function toggleRecord() {
+    var previousValue = transport.isArrangerAutomationWriteEnabled().get();
+    transport.record();
+    transport.isArrangerAutomationWriteEnabled().set(previousValue);
+}
+
+function togglePreRoll() {
+    if (preRollMode === PREROLLMODE.NONE) {
+        transport.preRoll().set(PREROLLMODE.TWO_BARS);
+    } else {
+        transport.preRoll().set(PREROLLMODE.NONE);
     }
 }

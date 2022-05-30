@@ -3,14 +3,14 @@ var JOGFACTOR_PANNING = 4;
 
 function initChannel() {
     // Creating views
-    trackBank = host.createMainTrackBank(1, 1, 1);
-    arrangerCursorTrack = host.createArrangerCursorTrack(1, 1);
-    trackBank.followCursorTrack(arrangerCursorTrack);
+    trackBank = host.createTrackBank(1, 0, 0, true);
+    cursorTrack = host.createCursorTrack("CC121_TRACK", "Cursor Track", 1, 1, true);
+    trackBank.followCursorTrack(cursorTrack);
     transport = host.createTransport();
     application = host.createApplication();
 
     // Publishing observers
-    trackBank.getChannel(0).mute().addValueObserver(function(isMuted) {
+    trackBank.getChannel(0).mute().addValueObserver(function (isMuted) {
         if (isMuted) {
             sendMidi(144, NOTE.MUTE, LIGHT_ON);
         } else {
@@ -18,7 +18,7 @@ function initChannel() {
         }
     });
 
-    trackBank.getChannel(0).solo().addValueObserver(function(isSolo) {
+    trackBank.getChannel(0).solo().addValueObserver(function (isSolo) {
         if (isSolo) {
             sendMidi(144, NOTE.SOLO, LIGHT_ON);
         } else {
@@ -26,7 +26,7 @@ function initChannel() {
         }
     });
 
-    transport.isArrangerAutomationWriteEnabled().addValueObserver(function(isAutomationWrite) {
+    transport.isArrangerAutomationWriteEnabled().addValueObserver(function (isAutomationWrite) {
         if (isAutomationWrite) {
             sendMidi(144, NOTE.AUTOMATIONWRITE, LIGHT_ON);
         } else {
@@ -34,15 +34,7 @@ function initChannel() {
         }
     });
 
-    transport.isAutomationOverrideActive().addValueObserver(function(isAutomationOverride) {
-        if (isAutomationOverride) {
-            sendMidi(144, NOTE.AUTOMATIONREAD, LIGHT_ON);
-        } else {
-            sendMidi(144, NOTE.AUTOMATIONREAD, LIGHT_OFF);
-        }
-    });
-
-    trackBank.getTrack(0).arm().addValueObserver(function(isArmed) {
+    trackBank.getTrack(0).arm().addValueObserver(function (isArmed) {
         if (isArmed) {
             sendMidi(144, NOTE.RECORDARM, LIGHT_ON);
         } else {
@@ -50,15 +42,15 @@ function initChannel() {
         }
     });
 
-    trackBank.getTrack(0).monitor().addValueObserver(function(isMonitored) {
-        if (isMonitored) {
+    trackBank.getTrack(0).monitorMode().addValueObserver(function (value) {
+        if (value.toUpperCase() === MONITORMODE.AUTO || value.toUpperCase() === MONITORMODE.ON) {
             sendMidi(144, NOTE.INPUTMONITOR, LIGHT_ON);
         } else {
             sendMidi(144, NOTE.INPUTMONITOR, LIGHT_OFF);
         }
     });
 
-    trackBank.getChannel(0).volume().value().addValueObserver(function(volumeValue) {
+    trackBank.getChannel(0).volume().value().addValueObserver(function (volumeValue) {
         var LSB = parseInt((volumeValue * 16383) % 128);
         var MSB = parseInt((volumeValue * 16383) / 128);
         sendMidi(224, LSB, MSB);
@@ -81,10 +73,10 @@ function onMidiChannel(status, data1, data2) {
     } else if (isNoteOn(status) && data2 > 0) {
         switch (data1) {
             case NOTE.CHANNELSELECTRIGHT:
-                arrangerCursorTrack.selectNext();
+                cursorTrack.selectNext();
                 break;
             case NOTE.CHANNELSELECTLEFT:
-                arrangerCursorTrack.selectPrevious();
+                cursorTrack.selectPrevious();
                 break;
             case NOTE.MUTE:
                 trackBank.getChannel(0).mute().toggle();
@@ -102,7 +94,7 @@ function onMidiChannel(status, data1, data2) {
                 trackBank.getTrack(0).arm().toggle();
                 break;
             case NOTE.INPUTMONITOR:
-                trackBank.getTrack(0).monitor().toggle();
+                toggleMonitorMode();
                 break;
             case NOTE.EBUTTON:
                 application.toggleInspector();
@@ -113,5 +105,20 @@ function onMidiChannel(status, data1, data2) {
         }
     } else if (status == 224) {
         trackBank.getChannel(0).volume().value().set(data2 * 128 + data1, 16383);
+    }
+}
+
+function toggleMonitorMode() {
+    var currentValue = trackBank.getTrack(0).monitorMode().get();
+    switch (currentValue.toUpperCase()) {
+        case MONITORMODE.AUTO:
+            trackBank.getTrack(0).monitorMode().set(MONITORMODE.ON);
+            break;
+        case MONITORMODE.ON:
+            trackBank.getTrack(0).monitorMode().set(MONITORMODE.OFF);
+            break;
+        case MONITORMODE.OFF:
+            trackBank.getTrack(0).monitorMode().set(MONITORMODE.AUTO);
+            break;
     }
 }

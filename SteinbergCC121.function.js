@@ -31,6 +31,18 @@ function onMidiFunction(status, data1, data2) {
             case NOTE.VALUEENCODERBUTTON:
                 transport.isMetronomeEnabled().toggle();
                 break;
+            case NOTE.EQENABLE1:
+                application.createAudioTrack(-1);
+                break;
+            case NOTE.EQENABLE2:
+                application.createInstrumentTrack(-1);
+                break;
+            case NOTE.EQENABLE3:
+                application.createEffectTrack(-1);
+                break;
+            case NOTE.EQENABLE4:
+                application.rename();
+                break;
         }
     }
 }

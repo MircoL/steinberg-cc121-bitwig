@@ -1,5 +1,5 @@
 // Note: blinking "READY LED" can not be avoided, CC121 needs F043103E150001F7 every second...
-loadAPI(5);
+loadAPI(14);
 load("SteinbergCC121.transport.js");
 load("SteinbergCC121.function.js");
 load("SteinbergCC121.ai.js");
@@ -76,14 +76,28 @@ var CC = {
     AIKNOB: 0x3C
 }
 
+var MONITORMODE = {
+    AUTO: 'AUTO',
+    ON: 'ON',
+    OFF: 'OFF'
+}
+
+var PREROLLMODE = {
+    NONE: 'none',
+    TWO_BARS: 'two_bars'
+}
+
 // Array of midi listeners
 var midiListeners;
 
 // Job button is for parameter acceleration;
 var isJogActive = false;
 
+// Either main or effect track bank
+var trackBank;
+
 // Company, product, script version, UUID, author
-host.defineController("Steinberg", "CC121", "1.1", "A1068940-6B61-11E8-B566-0800200C9A66", "Philipp Winniewski");
+host.defineController("Steinberg", "CC121", "1.2", "a32cae8c-de14-11ec-9d64-0242ac120002", "Philipp Winniewski");
 host.defineMidiPorts(1, 1);
 // For Windows
 host.addDeviceNameBasedDiscoveryPair(["Steinberg CC121-1"], ["Steinberg CC121-1"]);
@@ -102,6 +116,8 @@ function init() {
         initChannel(),
         initDevice()
     ];
+
+    println("Steinberg CC121 initialized!");
 }
 
 function exit() {

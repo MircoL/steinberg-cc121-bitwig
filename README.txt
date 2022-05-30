@@ -14,15 +14,15 @@ When using Linux, the script should automaticly find and subscribe the controlle
 There is an explanation what each knob and button does (assignment.pdf).  
 
 Changelog:
+Version 1.2:
+- changed behaviour for various elements
+- fixed track focus and selection
+- tested with Bitwig 4.0.8
+
 Version 1.1:
 - fixed float to int conversion for volumeValue, causing script to cease working in bitwig 3.3
-
-Known issues: 
-
-When changing a device parameter on parameter page 1, the LEDs of the parameter buttons (parameters 5-8 on page 2) light up like the parameters 5-8 on page 1. This seems inevitable with the current API due to the face that one can only set a callback for a parameter of the parameter view. When the view changes its page, the callback is activated. Moveover, increasing the amount of parameters per page seems not to work for values greater than 8, so that page scrolling is necessary. 
-However, the button function itself works fine - it is only the LEDs. 
 
 About:
 
 Author: Philipp Winniewski
-Date: 18/12/2020
+Date: 28/05/2022
